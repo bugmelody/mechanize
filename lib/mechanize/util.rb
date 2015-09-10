@@ -39,6 +39,7 @@ class Mechanize::Util
     # For a non-array-like, non-hash-like value, the key-value pair is
     # yielded as is.
     def each_parameter(parameters, &block)
+      # __method__ : 返回当前方法名的 symbol
       return to_enum(__method__, parameters) if block.nil?
 
       parameters.each { |key, value|

@@ -12,6 +12,8 @@ require 'uri'
 require 'webrick/httputils'
 require 'zlib'
 
+# ==qc: 111
+
 ##
 # The Mechanize library is used for automating interactions with a website.  It
 # can follow links and submit forms.  Form fields can be populated and
@@ -134,6 +136,7 @@ class Mechanize
     'Android' => 'Mozilla/5.0 (Linux; Android 4.4.2; Nexus 7 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Safari/537.36',
   }
 
+  # ==qc: http://ruby-doc.org/core-2.2.3/Hash.html, 注意构造函数,default_proc,default_proc=
   AGENT_ALIASES.default_proc = proc { |hash, key|
     case key
     when /FireFox/
@@ -144,6 +147,7 @@ class Mechanize
     end
   }
 
+  # ==qc: Callback invoked whenever a subclass of the current class is created.
   def self.inherited(child) # :nodoc:
     child.html_parser = html_parser
     child.log = log
@@ -216,6 +220,7 @@ class Mechanize
 
     yield self if block_given?
 
+    # ==qc: 上面已经 yield 了,下面这行会有意义吗?
     @agent.set_proxy @proxy_addr, @proxy_port, @proxy_user, @proxy_pass
   end
 
@@ -331,6 +336,7 @@ class Mechanize
     case link
     when Page::Link then
       referer = link.page || current_page()
+      # ==qc: @agent.robots :When true, this agent will consult the site's robots.txt for each access.
       if @agent.robots
         if (referer.is_a?(Page) and referer.parser.nofollow?) or
            link.rel?('nofollow') then
@@ -346,6 +352,7 @@ class Mechanize
       get href, [], referer
     when String, Regexp then
       if real_link = page.link_with(:text => link)
+        # 递归
         click real_link
       else
         button = nil
@@ -462,6 +469,7 @@ class Mechanize
     page = @agent.fetch uri, method, headers, parameters, referer
     add_to_history(page)
     yield page if block_given?
+    # 上面有个 yield,下面的执行流程是怎么样的?
     page
   end
 
@@ -552,6 +560,7 @@ class Mechanize
 
     log.debug("query: #{ entity.inspect }") if log
 
+    # 以 字面量作为初始值,如果有重复key,由函数参数的headers覆盖
     headers = {
       'Content-Type' => 'application/octet-stream',
       'Content-Length' => entity.size.to_s,
@@ -1245,6 +1254,7 @@ Use of #auth and #basic_auth are deprecated due to a security vulnerability.
 
     parser_klass = @pluggable_parser.parser content_type
 
+    # ==qc :这里的 <= 是什么意思
     unless parser_klass <= Mechanize::Download then
       body = case body
              when IO, Tempfile, StringIO then
